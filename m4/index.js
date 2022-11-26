@@ -47,6 +47,7 @@ register("chat", (event) => {
 
 register("chat", (name) => {
   let uuid = null;
+  new Thread( () => {
   request(`https://api.mojang.com/users/profiles/minecraft/${name}`).then(function(res) {
     uuid = JSON.parse(res)["id"];
   })
@@ -59,7 +60,6 @@ register("chat", (name) => {
     }
   }
   
-  new Thread( () => {
     Thread.sleep(1000)
     request(`https://api.slothpixel.me/api/skyblock/profile/${uuid}/`).then( function(res) {
       let m4 = JSON.parse(res)["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"];
@@ -80,6 +80,7 @@ register("command", (...args) => {
   }
   let name = args[0];
   let uuid = null;
+  new Thread( () => {
   request(`https://api.mojang.com/users/profiles/minecraft/${name}`).then(function(res) {
     uuid = JSON.parse(res)["id"];
   })
@@ -90,11 +91,11 @@ register("command", (...args) => {
       return;
     }
   }
-  new Thread( () => {
     Thread.sleep(1000)
     request(`https://api.slothpixel.me/api/skyblock/profile/${uuid}/`).then( function(res) {
       let m4 = JSON.parse(res)["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"];
       ChatLib.command(`pc ${name} has completed ${m4} M4s`)
     });
   }).start();
+
 }).setName("comps")
