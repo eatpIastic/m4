@@ -1,14 +1,10 @@
 /// <reference types="../CTAutocomplete" />
+import Promise from "../PromiseV2";
 import RenderLib from "../RenderLib"
 import request from '../requestV2';
 
-register("command", (...args) => {
-  data.key = args[0];
-  data.save();
-}).setName("m4apikey")
-
-let boss = false;
-let bows = [];
+let boss = false
+let bows = []
 
 register("worldLoad", () => {
   boss = false;
@@ -44,58 +40,29 @@ register("chat", (event) => {
   cancel(event);
 }).setCriteria("This creature is immune to this kind of magic!")
 
-
-register("chat", (name) => {
-  let uuid = null;
-  new Thread( () => {
-  request(`https://api.mojang.com/users/profiles/minecraft/${name}`).then(function(res) {
-    uuid = JSON.parse(res)["id"];
+const get_data = (username) => {
+  if(!username) username = Player.getName()
+  Promise.all([
+    request({url : `https://playerdb.co/api/player/minecraft/${username}`,headers: { 'User-Agent': ' Mozilla/5.0' }, json: true})
+  ]).then(uuid_data => {
+    let uuid = uuid_data[0].data.player.raw_id
+    let name = uuid_data[0].data.player.username
+    Promise.all([
+      request({url : `https://api.slothpixel.me/api/skyblock/profile/${uuid}/`,headers: { 'User-Agent': ' Mozilla/5.0' }, json: true})
+    ]).then(user_data => {
+      //
+      let comps = parseInt(user_data[0]["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"])
+      ChatLib.chat(`&b${name} &rhas completed &b${comps}&r M4s`)
+    })
   })
+  request({url : `https://playerdb.co/api/player/minecraft/${username}`,headers: { 'User-Agent': ' Mozilla/5.0' }}).then(response => JSON.parse(response)).catch(error =>{ print(error);});
+}
 
-  let time = Date.now();
-  while(uuid == null) {
-    if(Date.now() - time > 1000) {
-      ChatLib.chat("&cFailed to get UUID");
-      return;
-    }
-  }
-  
-    Thread.sleep(1000)
-    request(`https://api.slothpixel.me/api/skyblock/profile/${uuid}/`).then( function(res) {
-      let m4 = JSON.parse(res)["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"];
-      Thread.sleep(1500)
-      ChatLib.chat(`&b${name}&r has completed &b${m4}&r M4s`)
-    });
-  }).start();
-  
-  // https://api.slothpixel.me/api/skyblock/profile/{playerName}/{profileId}
-  
+register("chat", (username) => {
+  get_data(username)
 }).setCriteria(/Dungeon Finder > (.+) joined the dungeon group! \(.+\)/)
 
 
-register("command", (...args) => {
-  if(args==null || args==undefined || args.length==0) {
-    ChatLib.chat("&cPlease specify a player");
-    return;
-  }
-  let name = args[0];
-  let uuid = null;
-  new Thread( () => {
-  request(`https://api.mojang.com/users/profiles/minecraft/${name}`).then(function(res) {
-    uuid = JSON.parse(res)["id"];
-  })
-  let time = Date.now();
-  while(uuid == null) {
-    if(Date.now() - time > 1000) {
-      ChatLib.chat("&cFailed to get UUID");
-      return;
-    }
-  }
-    Thread.sleep(1000)
-    request(`https://api.slothpixel.me/api/skyblock/profile/${uuid}/`).then( function(res) {
-      let m4 = JSON.parse(res)["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"];
-      ChatLib.command(`pc ${name} has completed ${m4} M4s`)
-    });
-  }).start();
-
+register("command", (username) => {
+  get_data(username)
 }).setName("comps")
