@@ -1,9 +1,11 @@
 {
   "name": "m4",
   "creator": "JohnCraftsYT",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "entry": "index.js",
   "requires": [
-    "RenderLib"
+    "RenderLib",
+    "requestV2",
+    "PromiseV2"
   ]
 }
