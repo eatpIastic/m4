@@ -1,12 +1,13 @@
 {
   "name": "m4",
   "creator": "JohnCraftsYT",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "entry": "index.js",
   "requires": [
     "RenderLib",
     "PromiseV2",
     "requestV2",
-    "Vigilance"
+    "Vigilance",
+    "PogData"
   ]
 }

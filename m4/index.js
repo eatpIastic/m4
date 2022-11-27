@@ -1,8 +1,8 @@
 /// <reference types="../CTAutocomplete" />
 import RenderLib from "../RenderLib"
-import Promise from "../PromiseV2";
-import request from "../requestV2";
 import Settings from "./config";
+import { get_data } from "./utils/utils";
+import "./features/displayloot"
 
 register("command", () => Settings.openGUI()).setName("m4utils", true);
 
@@ -47,35 +47,10 @@ register("chat", (event) => {
 
 register("chat", (name) => {
   if(!Settings.m4CompletionsChecker) return;
-  setTimeout( () => get_data(name, false), 2500)
+  setTimeout( () => get_data(name), 2500)
 }).setCriteria(/Dungeon Finder > (.+) joined the dungeon group! \(.+\)/)
 
 
-register("command", (...args) => {
-  if(args==null || args==undefined || args.length==0) {
-    ChatLib.chat("&cPlease specify a player");
-    return;
-  }
-  get_data(args[0], true);
+register("command", (username) => {
+  get_data(username)
 }).setName("comps")
-
-
-const get_data = (username, say) => {
-  Promise.all([
-    request({url : `https://playerdb.co/api/player/minecraft/${username}`,headers: { 'User-Agent': ' Mozilla/5.0' }, json: true})
-  ]).then(uuid_data => {
-    let uuid = uuid_data[0].data.player.raw_id
-    let name = uuid_data[0].data.player.username
-    Promise.all([
-      request({url : `https://api.slothpixel.me/api/skyblock/profile/${uuid}/`,headers: { 'User-Agent': ' Mozilla/5.0' }, json: true})
-    ]).then(user_data => {
-      //
-      let comps = parseInt(user_data[0]["members"][uuid]["dungeons"]["dungeon_types"]["master_catacombs"]["tier_completions"]["4"])
-      if(say) {
-        ChatLib.command(`pc ${name} has completed ${comps} M4s`)
-      }
-      ChatLib.chat(`&b${name} &rhas completed &b${comps}&r M4s`)
-    })
-  })
-  request({url : `https://playerdb.co/api/player/minecraft/${username}`,headers: { 'User-Agent': ' Mozilla/5.0' }}).then(response => JSON.parse(response)).catch(error =>{ print(error);});
-}
