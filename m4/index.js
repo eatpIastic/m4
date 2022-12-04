@@ -1,13 +1,13 @@
 /// <reference types="../CTAutocomplete" />
 import RenderLib from "../RenderLib"
-import Settings from "./config";
-import { get_data } from "./utils/utils";
+import Settings from "./config"
+import { get_data } from "./utils/utils"
 import "./features/displayloot"
 
-register("command", () => Settings.openGUI()).setName("m4utils", true);
+register("command", () => Settings.openGUI()).setName("m4utils", true)
 
-let boss = false;
-let bows = [];
+let boss = false
+let bows = []
 
 register("worldLoad", () => {
   boss = false;
@@ -18,7 +18,7 @@ register("chat", () => {
 }).setCriteria(/\[BOSS\] Thorn.+/)
 
 register("renderWorld", () => {
-  if(!boss) return;
+  if(!boss) return
   bows.forEach(bow => {
 	  if(Settings.spiritBowEsp && bow.getName().includes("Spirit Bow")) {
 		  RenderLib.drawBaritoneEspBox(bow.getRenderX(), bow.getRenderY(), bow.getRenderZ(), .75, 5, 255, 215, 0, 1, false)
@@ -29,13 +29,12 @@ register("renderWorld", () => {
 })
 
 register("step", () => {
-  if(!boss) return;
-  if(!Settings.spiritBearEsp && !Settings.spiritBowEsp) return;
+  if(!boss || !World.isLoaded() || !Settings.spiritBearEsp && !Settings.spiritBowEsp) return
   new Thread(() => bows = World.getAllEntities().filter(e => e.getName().includes("Spirit"))).start();
 }).setFps(2)
 
 register("spawnParticle", (name, type, event) => {
-  if(!boss || !Settings.disableAotdParticles) return;
+  if(!boss || !Settings.disableAotdParticles) return
   if(type.toString().includes("FLAME")) cancel(event)
 })
 

@@ -20,17 +20,19 @@ register("step", () => {
             if(e.getName().removeFormatting() == "Second Master Star" && !added){
                 secondmaster += 1
                 added = true
-            }else if(e.getName().removeFormatting() == "Spirit Wing" && !added){
+            }
+            if(e.getName().removeFormatting() == "Spirit Wing" && !added){
                 spiritwing += 1
                 added = true
-            }else if(e.getName().removeFormatting() == "Spirit Bow" && !added){
+            }
+            if(e.getName().removeFormatting() == "Spirit Bow" && !added){
                 spiritbow += 1
                 added = true
             }
 
         })
     }
-}).setFps(2)
+}).setFps(3)
 
 register("renderOverlay", () => {
     if(!config.lootoverlay) return
