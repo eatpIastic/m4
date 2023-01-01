@@ -47,7 +47,7 @@ register("chat", (event) => {
 register("chat", (name) => {
   if(!Settings.m4CompletionsChecker) return;
   setTimeout( () => get_data(name), 2500)
-}).setCriteria(/Dungeon Finder > (.+) joined the dungeon group! \(.+\)/)
+}).setCriteria(/Party Finder > (.+) joined the dungeon group! \(.+\)/)
 
 
 register("command", (username) => {
